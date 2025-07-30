@@ -1,7 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { User } from "@/generated/prisma"
+import { User } from "next-auth"
 
 export default function UserInfo({ user }: { user: User | null }) {
     
@@ -10,10 +10,10 @@ export default function UserInfo({ user }: { user: User | null }) {
             <div className="flex items-center text-left gap-2">
                 <Avatar >
                     <AvatarImage
-                        src={user?.picture}
-                        alt={user?.name}
+                        src={user?.image!}
+                        alt={user?.name!}
                     />
-                    <AvatarFallback className="text-primary"> {user?.name.charAt(0)}</AvatarFallback>
+                    <AvatarFallback className="text-primary"> {user?.name!.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col gap-y-1">
                     {user?.name}

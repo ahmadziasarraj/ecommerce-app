@@ -3,7 +3,7 @@ import { DashboardSidebarMenuInterface } from "@/lib/types";
 export const adminDashboardSidebarOptions: DashboardSidebarMenuInterface[] = [
   {
     label: "Dashboard",
-    icon: "dashboard",
+    icon: "dashboard", 
     link: "/dashboard/admin",
   },
   {

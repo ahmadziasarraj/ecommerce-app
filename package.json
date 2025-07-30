@@ -9,10 +9,9 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@clerk/backend": "^1.33.0",
-    "@clerk/nextjs": "^6.20.0",
+    "@auth/prisma-adapter": "^2.10.0",
     "@hookform/resolvers": "^5.0.1",
-    "@prisma/client": "^6.8.2",
+    "@prisma/client": "^6.12.0",
     "@radix-ui/react-accordion": "^1.2.11",
     "@radix-ui/react-alert-dialog": "^1.1.14",
     "@radix-ui/react-aspect-ratio": "^1.1.7",
@@ -42,11 +41,12 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
-    "date-fns": "^4.1.0",
+    "date-fns": "^3.6.0",
     "embla-carousel-react": "^8.6.0",
     "input-otp": "^1.4.2",
     "lucide-react": "^0.511.0",
     "next": "^15.3.2",
+    "next-auth": "^5.0.0-beta.29",
     "next-themes": "^0.4.6",
     "react": "^19.1.0",
     "react-day-picker": "^8.10.1",
@@ -69,7 +69,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.1.8",
     "postcss": "^8",
-    "prisma": "^6.8.2",
+    "prisma": "^6.12.0",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
   }

@@ -17,7 +17,7 @@ import {
   export const icons = [
     {
       label: "Dashboard",
-      value: "dashboard",
+      value: "dashboard", 
       path: DashboardIcon,
     },
     {

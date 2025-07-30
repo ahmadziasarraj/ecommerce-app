@@ -3,3 +3,4 @@ export interface DashboardSidebarMenuInterface {
     icon: string,
     link: string
 }
+
