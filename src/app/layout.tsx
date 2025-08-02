@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono, Nunito } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
+import { Toaster } from "@/components/ui/sonner";
 
 const nunitoFont = Nunito({
   variable: "--font-nunito",
@@ -35,6 +36,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <Toaster position="bottom-right"/>
         </ThemeProvider>
       </body>
     </html>

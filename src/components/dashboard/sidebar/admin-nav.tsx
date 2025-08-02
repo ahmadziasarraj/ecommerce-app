@@ -7,7 +7,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function AdminSidebarNav({menuLinks} : {menuLinks:DashboardSidebarMenuInterface[]}) {
-    const pathName = usePathname();
+    const pathName = usePathname(); 
+    
   return (
     <nav className="relative grow">
         <Command className="bg-transparent overflow-visible">
