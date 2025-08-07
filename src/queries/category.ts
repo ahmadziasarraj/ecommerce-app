@@ -50,6 +50,32 @@ export const upsertCategory = async (category: Category) => {
         throw error;        
     }
 
+}
 
+export const getCategories = async () => {
+    const categories = await prisma.category.findMany({
+        orderBy: {
+            updatedAt: 'desc'
+        }
+    });
+    return categories;
+}
 
+export const getCategory = async (id:string) => {
+    const category = await prisma.category.findFirst({
+        where: {
+            id: id
+        }
+    });
+    return category;
+}
+
+export const deleteCategory = async (id:string) => {
+    const response = await prisma.category.delete({
+        where: {
+            id: id
+        }
+    });
+
+    return response;
 }

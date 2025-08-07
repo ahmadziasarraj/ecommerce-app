@@ -1,12 +1,11 @@
-
 generator client {
   provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider = "mysql"
-  url      = env("DATABASE_URL")
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
   relationMode = "prisma"
 }
 
@@ -16,25 +15,25 @@ enum Role {
   SELLER
 }
 
-
 model User {
-  id            String          @id @default(cuid())
+  id            String    @id @default(cuid())
   name          String?
-  username      String?         @unique
-  email         String?         @unique
+  username      String?   @unique
+  email         String?   @unique
   emailVerified DateTime?
-  image         String? @db.Text
-  role Role @default(USER)
+  image         String?   @db.Text
+  role          Role      @default(USER)
 
   accounts      Account[]
   sessions      Session[]
+  stores Store[]
   // Optional for WebAuthn support
   Authenticator Authenticator[]
- 
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
- 
+
 model Account {
   id                       String  @id @default(cuid())
   userId                   String  @unique
@@ -50,35 +49,35 @@ model Account {
   session_state            String?
   refresh_token_expires_in Int?
   user                     User?   @relation(fields: [userId], references: [id])
- 
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
- 
+
   @@unique([provider, providerAccountId])
   @@index([userId])
 }
- 
+
 model Session {
   id           String   @id @default(cuid())
   sessionToken String   @unique
   userId       String
   expires      DateTime
   user         User     @relation(fields: [userId], references: [id])
- 
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
- 
+
   @@index([userId])
 }
- 
+
 model VerificationToken {
   identifier String
   token      String
   expires    DateTime
- 
+
   @@unique([identifier, token])
 }
- 
+
 // Optional for WebAuthn support
 model Authenticator {
   credentialID         String  @unique
@@ -89,20 +88,70 @@ model Authenticator {
   credentialDeviceType String
   credentialBackedUp   Boolean
   transports           String?
- 
+
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
- 
+
   @@id([userId, credentialID])
 }
 
 model Category {
-  id String @id @default(uuid())
-  name String
-  image String
-  url String @unique
+  id         String  @id @default(uuid())
+  name       String
+  image      String
+  url        String  @unique
   isFeatured Boolean @default(false)
-  
+
+  subCategories SubCategory[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+model SubCategory {
+  id         String   @id @default(uuid())
+  name       String
+  image      String
+  url        String   @unique
+  isFeatured Boolean  @default(false)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categoryId String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([categoryId])
+}
+
+enum StoreStatus {
+  PENDING
+  ACTIVE
+  BANNED
+  DISABLED
+}
+
+model Store {
+  id         String   @id @default(uuid())
+  name String
+  description String @db.Text
+  email String @unique
+  phone String
+  url String @unique
+  logo String
+  cover String
+  status StoreStatus @default(PENDING)
+  averageRating Float @default(0)
+  isFeatured Boolean @default(false)
+  returnPolicy String?
+  defaultShippingService String?
+  defaultShippingFees Float?
+  defaultDeliveryTimeMin Int?
+  defaultDeliveryTimeMax Int?
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}

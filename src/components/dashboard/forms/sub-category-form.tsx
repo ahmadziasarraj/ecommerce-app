@@ -1,7 +1,7 @@
 "use client";
 
-import { Category } from '@/generated/prisma'
-import { CategoryFormSchema } from '@/lib/schemas'
+import { Category, SubCategory } from '@/generated/prisma'
+import { SubCategoryFormSchema } from '@/lib/schemas'
 import React, { FC, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
@@ -19,21 +19,28 @@ import { v4 } from 'uuid';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
 import { useModal } from '@/providers/modal-provider';
+import { upsertSubCategory } from '@/queries/sub-category';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+import { Check, ChevronsUpDown } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 
-interface CategoryformProps {
-  data?: Category
+interface SubCategoryformProps {
+  data?: SubCategory,
+  categories: Category[]
 }
-const CategoryForm: FC<CategoryformProps> = ({ data }) => {
+const SubCategoryForm: FC<SubCategoryformProps> = ({ data, categories }) => {
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof CategoryFormSchema>>({
+  const form = useForm<z.infer<typeof SubCategoryFormSchema>>({
     mode: 'onChange',
-    resolver: zodResolver(CategoryFormSchema),
+    resolver: zodResolver(SubCategoryFormSchema),
     defaultValues: {
       name: data?.name ?? '',
       image: data?.image ? [{ url: data.image }] : [],
       isFeatured: data?.isFeatured ?? false,
-      url: data?.url ?? ''
+      url: data?.url ?? '',
+      categoryId: data?.categoryId ?? ''
     }
   });
 
@@ -46,38 +53,40 @@ const CategoryForm: FC<CategoryformProps> = ({ data }) => {
         name: data.name,
         image: [{ url: data.image }],
         isFeatured: data.isFeatured,
-        url: data.url
+        url: data.url,
+        categoryId: data.categoryId
       });
     }
   }, [data, form]);
 
   // Handle Form Submission.
-  const onSubmit = async (values: z.infer<typeof CategoryFormSchema>) => {
+  const onSubmit = async (values: z.infer<typeof SubCategoryFormSchema>) => {
 
     try {
-      // Upsert Category into database.
-      const res = await upsertCategory({
+      // Upsert Sub Category into database.
+      const res = await upsertSubCategory({
         id: data?.id ? data.id : v4(),
         name: values.name,
         isFeatured: values.isFeatured,
         url: values.url,
         image: values.image[0].url,
+        categoryId: values.categoryId,
         createdAt: new Date(),
         updatedAt: new Date(),
       })
 
       // Show the sooner
-      toast(data?.id ? `The Category with the name: ${data.name}` : 'Congratulations! New category has been created.');
+      toast(data?.id ? `The sub-Category with the name: ${data.name}` : 'Congratulations! New sub-category has been created.');
 
       if (data?.id) {
         router.refresh();
       } else {
-        router.push('/dashboard/admin/categories')
+        router.push('/dashboard/admin/subCategories')
       }
-      
+
     } catch (error: any) {
 
-      toast('Error',{
+      toast('Error', {
         description: error.toString(),
       });
       throw error;
@@ -89,8 +98,8 @@ const CategoryForm: FC<CategoryformProps> = ({ data }) => {
     <AlertDialog>
       <Card>
         <CardHeader>
-          <CardTitle>Category Information</CardTitle>
-          <CardDescription>{data?.id ? `Update ${data.name} information.` : 'Lets create a category. You can edit category later from the category page.'}</CardDescription>
+          <CardTitle>Sub-Category Information</CardTitle>
+          <CardDescription>{data?.id ? `Update ${data.name} information.` : 'Lets create a sub-category. You can edit sub-category later from the sub-category page.'}</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -117,15 +126,15 @@ const CategoryForm: FC<CategoryformProps> = ({ data }) => {
                   )}
                 />
               </div>
-              <div className='w-full flex gap-2 my-2'>
+              <div className='w-full md:flex items-center justify-between gap-2 my-2'>
                 <FormField
                   control={form.control}
                   name="name"
                   render={({ field }) => (
                     <FormItem className='w-full'>
-                      <FormLabel>Category Name</FormLabel>
+                      <FormLabel>Sub-Category Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Category Name" {...field} />
+                        <Input placeholder="Sub-Category Name" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -140,6 +149,69 @@ const CategoryForm: FC<CategoryformProps> = ({ data }) => {
                       <FormControl>
                         <Input placeholder="url" {...field} />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="categoryId"
+                  render={({ field }) => (
+                    <FormItem className=" w-full">
+                      <FormLabel>Category</FormLabel>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground"
+                              )}
+                            >
+                              {field.value
+                                ? categories.find(
+                                  (category) => category.id === field.value
+                                )?.name
+                                : "Select category"}
+                              <ChevronsUpDown className="opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className=" p-0">
+                          <Command>
+                            <CommandInput
+                              placeholder="Search categories..."
+                              className="h-9"
+                            />
+                            <CommandList>
+                              <CommandEmpty>No category found.</CommandEmpty>
+                              <CommandGroup>
+                                {categories.map((category) => (
+                                  <CommandItem
+                                    value={category.id}
+                                    key={category.id}
+                                    onSelect={() => {
+                                      form.setValue("categoryId", category.id)
+                                    }}
+                                  >
+                                    {category.name}
+                                    <Check
+                                      className={cn(
+                                        "ml-auto",
+                                        category.id === field.value
+                                          ? "opacity-100"
+                                          : "opacity-0"
+                                      )}
+                                    />
+                                  </CommandItem>
+                                ))}
+                              </CommandGroup>
+                            </CommandList>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -174,8 +246,8 @@ const CategoryForm: FC<CategoryformProps> = ({ data }) => {
                 isLoading
                   ? 'Loading...'
                   : data?.id
-                    ? 'Update Category'
-                    : 'Create Category'
+                    ? 'Update Sub-Category'
+                    : 'Create Sub-Category'
               }</Button>
             </form>
           </Form>
@@ -185,4 +257,4 @@ const CategoryForm: FC<CategoryformProps> = ({ data }) => {
   )
 }
 
-export default CategoryForm;
+export default SubCategoryForm;

@@ -30,7 +30,7 @@ const ImageUploader: FC<ImageUploaderProps> = ({
 
     if (type === "profile") {
         return (
-            <div className="relative rounded-full w-44 h-44 bg-gray-200 border-2 border-white shadow-md inset-x-96 ">
+            <div className="relative rounded-full w-44 h-44 bg-gray-200 border-2 border-white shadow-md">
                 {value.length > 0 && <Image src={value[0]} width={176} height={176} alt="Profile" className="absolute top-0 left-0 bottom-0 right-0 w-44 h-44 rounded-full object-cover " />}
                 <CldUploadWidget onSuccess={onUpload} uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_PRESET_NAME}>
                     {({ open }) => {

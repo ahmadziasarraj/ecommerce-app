@@ -3,6 +3,7 @@ import { Geist_Mono, Nunito } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
+import ModalProvider from "@/providers/modal-provider";
 
 const nunitoFont = Nunito({
   variable: "--font-nunito",
@@ -25,7 +26,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark" style={{colorScheme:"dark"}}>
+    <html lang="en" className="dark" style={{ colorScheme: "dark" }}>
       <body
         className={`${nunitoFont.variable} ${geistMono.variable} antialiased`}
       >
@@ -35,8 +36,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <Toaster position="bottom-right"/>
+          <ModalProvider>
+            {children}
+          </ModalProvider>
+          <Toaster position="bottom-right" />
         </ThemeProvider>
       </body>
     </html>
