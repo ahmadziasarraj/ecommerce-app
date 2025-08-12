@@ -9,7 +9,7 @@ interface LogoProps {
 
 const Logo: FC<LogoProps> = async ({width, height}) => {
     return (
-        <div className="z-50" style={{width, height}}>
+        <div style={{width, height}}>
             <Image 
                 alt="Logo"
                 src={LogoImg}
