@@ -1,19 +1,15 @@
 "use server";
 
-import { auth } from "@/auth"
 import { prisma } from '@/prisma'
 import { redirect } from "next/navigation";
 import { Store } from '@/generated/prisma'
+import { checkForAuth } from "@/lib/utils";
+import { auth } from '@/auth';
 
 
 export const upsertStore = async (store: Partial<Store>) => {
      try {
-            const session = await auth();
-            // Check if the user is authenticated.
-            if (!session) throw new Error('Your are not logged in. Please login and try to create a store.');
-    
-            // Check for Permission.
-            if (session.user.role !== 'SELLER') throw new Error('You don not have permission to create store.');
+            const session = await checkForAuth(['SELLER']);
     
             // Check if all fields are available.
             if (!store) throw new Error('Make sure to fill all fields and submit again.');

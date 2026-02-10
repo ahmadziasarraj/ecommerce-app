@@ -1,6 +1,6 @@
 import { auth } from "@/auth";
 import Header from "@/components/dashboard/header/header";
-import Sidebar from "@/components/dashboard/sidebar/sidebar";
+import Sidebar from "@/components/dashboard/sidebar/sidebar-deleted";
 import { getUserStores } from "@/queries/store";
 import { redirect } from "next/navigation";
 
